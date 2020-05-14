@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 function toUTF8Array(str) {
     var utf8 = [];
     for (var i=0; i < str.length; i++) {
@@ -94,4 +96,10 @@ function HexToByteArray(str) {
     return byteArray;
 }
 
-module.exports = { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray };
+function cryptoHash(str) {
+    const hash = crypto.createHash('sha256');
+    hash.update(str);
+    return hash.digest('hex');
+}
+
+module.exports = { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, cryptoHash };
