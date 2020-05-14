@@ -6,6 +6,7 @@ class Transaction {
         this.outputs = outputs;
         var buffer = this.transactionToByteArray();
         this.id = cryptoHash(buffer.toString());
+        this.data = Uint8Array.from(buffer);
     }
 
     addOutput( output ) {
@@ -36,9 +37,7 @@ class Transaction {
 
             byteArray = HexToByteArray(inputs[i].id);
             buf1 = new Uint8Array(byteArray.length);
-            for(let j = 0; j< byteArray.length; j++) {
-                buf1[j] = byteArray[j];
-            }
+            for(let j = 0; j< byteArray.length; j++) buf1[j] = byteArray[j];
             buf1 = Buffer.from(buf1);
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
@@ -70,6 +69,7 @@ class Transaction {
         buffer = Buffer.concat(list);
 
         for(let i = 0; i< outputLength; i++) {
+            
             byteArray = longToByteArray(outputs[i].coins);
             buf1 = new Uint8Array(8);
             for(let j = 0; j < 8; j++) buf1[j] = byteArray[j];
