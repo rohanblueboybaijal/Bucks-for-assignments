@@ -43,6 +43,12 @@ var transaction = new Transaction({inputs, outputs});
 var fileName = transaction.id;
 fs.writeFileSync(fileName, transaction.data);
 
+var checkTransaction = transaction.byteArrayToTransaction();
+console.log(transaction);
+console.log(checkTransaction);
+var check = JSON.stringify(transaction) == JSON.stringify(checkTransaction);
+console.log(check);
+
 
 // var inputs = [];
 // var input = new Input({ 

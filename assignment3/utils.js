@@ -96,10 +96,39 @@ function HexToByteArray(str) {
     return byteArray;
 }
 
+function ByteArrayToHex(byteArray) {
+    var str = '';
+    const len = byteArray.length;
+    var num;
+    for(let i=0; i< len; i++) {
+        num = byteArray[i];
+        var num1 = Math.floor(num/16);
+        if(num1>=0 && num1<=9) {
+            str = str + num1;
+        }
+        else {
+            var ch = 97 + num1 - 10;
+            ch = String.fromCharCode(ch);
+            str = str + ch;
+        }
+        var num2 = num - 16*num1;
+        if(num2>=0 && num2 <=9) {
+            str = str + num2;
+        }
+        else {
+            var ch = 97 + num2 - 10;
+            ch = String.fromCharCode(ch);
+            str = str + ch;
+        }
+    }
+    
+    return str;
+}
+
 function cryptoHash(str) {
     const hash = crypto.createHash('sha256');
     hash.update(str);
     return hash.digest('hex');
 }
 
-module.exports = { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, cryptoHash };
+module.exports = { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash };
