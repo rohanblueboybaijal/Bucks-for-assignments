@@ -28,7 +28,7 @@ var numOutput = readlineSync.question('Enter the number  of outputs') - 0;
 
 var coins, publicKey, publicKeyPath;
 for(let i=0; i< numOutput; i++) {
-    coins = readlineSync.question('Enter the number of coins ');
+    coins = readlineSync.question('Enter the number of coins ') - 0;
     publicKeyPath = readlineSync.question('Enter publicKeyPath ');
     publicKey = fs.readFileSync(publicKeyPath, 'utf8');
     output = new Output({
@@ -46,6 +46,31 @@ fs.writeFileSync(fileName, transaction.data);
 var checkTransaction = transaction.byteArrayToTransaction();
 console.log(transaction);
 console.log(checkTransaction);
+
+const numInputs = checkTransaction.inputs.length;
+for(let i=0;i<numInputs; i++) {
+    var val;
+    val = transaction.inputs[i].id == checkTransaction.inputs[i].id;
+    console.log('id check ', val);
+    val = transaction.inputs[i].index == checkTransaction.inputs[i].id;
+    console.log('index check ', val);
+    val = transaction.inputs[i].signature == checkTransaction.inputs[i].signature;
+    console.log('check signature ', val);
+    val = transaction.inputs[i].signatureLength == checkTransaction.inputs[i].signatureLength;
+    console.log('check signatureLength ', val)
+}
+
+const numOutputs = checkTransaction.outputs.length;
+for(let i=0; i<numOutputs; i++) {
+    var val ;
+    val = transaction.outputs[i].coins == checkTransaction.outputs[i].coins;
+    console.log('coins check ', val);
+    val = transaction.outputs[i].publicKey == checkTransaction.outputs[i].publicKey;
+    console.log('publicKey check ' , val);
+    val = transaction.outputs[i].publicKeyLength == checkTransaction.outputs[i].publicKeyLength;
+    console.log('publicKeyLength check', val);
+
+}
 var check = JSON.stringify(transaction) == JSON.stringify(checkTransaction);
 console.log(check);
 
