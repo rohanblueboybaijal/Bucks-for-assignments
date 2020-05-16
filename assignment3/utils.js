@@ -1,35 +1,26 @@
 const crypto = require('crypto');
 
-function toUTF8Array(str) {
-    var utf8 = [];
-    for (var i=0; i < str.length; i++) {
-        var charcode = str.charCodeAt(i);
-        if (charcode < 0x80) utf8.push(charcode);
-        else if (charcode < 0x800) {
-            utf8.push(0xc0 | (charcode >> 6), 
-                      0x80 | (charcode & 0x3f));
-        }
-        else if (charcode < 0xd800 || charcode >= 0xe000) {
-            utf8.push(0xe0 | (charcode >> 12), 
-                      0x80 | ((charcode>>6) & 0x3f), 
-                      0x80 | (charcode & 0x3f));
-        }
-        // surrogate pair
-        else {
-            i++;
-            // UTF-16 encodes 0x10000-0x10FFFF by
-            // subtracting 0x10000 and splitting the
-            // 20 bits of 0x0-0xFFFFF into two halves
-            charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-                      | (str.charCodeAt(i) & 0x3ff));
-            utf8.push(0xf0 | (charcode >>18), 
-                      0x80 | ((charcode>>12) & 0x3f), 
-                      0x80 | ((charcode>>6) & 0x3f), 
-                      0x80 | (charcode & 0x3f));
-        }
-    }
-    return utf8;
-}
+// function longToByteArray(/*long*/long) {
+//     // we want to represent the input as a 8-bytes array
+//     var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+
+//     for ( var index = 0; index < byteArray.length; index ++ ) {
+//         var byte = long & 0xff;
+//         byteArray [ index ] = byte;
+//         long = (long - byte) / 256 ;
+//     }
+
+//     return byteArray;
+// };
+
+// function byteArrayToLong(/*byte[]*/byteArray) {
+//     var value = 0;
+//     for ( var i = byteArray.length - 1; i >= 0; i--) {
+//         value = (value * 256) + byteArray[i];
+//     }
+
+//     return value;
+// };
 
 function longToByteArray(/*long*/long) {
     // we want to represent the input as a 8-bytes array
@@ -41,37 +32,18 @@ function longToByteArray(/*long*/long) {
         long = (long - byte) / 256 ;
     }
 
-    return byteArray;
+    return byteArray.reverse();
 };
 
 function byteArrayToLong(/*byte[]*/byteArray) {
     var value = 0;
-    for ( var i = byteArray.length - 1; i >= 0; i--) {
-        value = (value * 256) + byteArray[i];
-    }
-
-    return value;
-};function longToByteArray(/*long*/long) {
-    // we want to represent the input as a 8-bytes array
-    var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-
-    for ( var index = 0; index < byteArray.length; index ++ ) {
-        var byte = long & 0xff;
-        byteArray [ index ] = byte;
-        long = (long - byte) / 256 ;
-    }
-
-    return byteArray;
-};
-
-function byteArrayToLong(/*byte[]*/byteArray) {
-    var value = 0;
-    for ( var i = byteArray.length - 1; i >= 0; i--) {
+    for ( var i = 0; i <byteArray.length; i++) {
         value = (value * 256) + byteArray[i];
     }
 
     return value;
 };
+
 
 function HexToByteArray(str) {
     var byteArray = [];
@@ -131,4 +103,4 @@ function cryptoHash(str) {
     return hash.digest('hex');
 }
 
-module.exports = { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash };
+module.exports = { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash };

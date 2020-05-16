@@ -1,14 +1,14 @@
 const Input = require('./input');
 const Output = require('./output');
-const { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash } = require('./utils');
+const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash } = require('./utils');
 
 class Transaction {
     constructor({ inputs, outputs }) {
         this.inputs = inputs;
         this.outputs = outputs;
         var buffer = this.transactionToByteArray();
-        this.id = cryptoHash(buffer.toString());
         this.data = Uint8Array.from(buffer);
+        this.id = cryptoHash(this.data);
     }
 
     addOutput( output ) {
@@ -29,7 +29,7 @@ class Transaction {
         var inputLength = inputs.length;
         var byteArray = longToByteArray(inputLength);
         buf1 = new Uint8Array(4)
-        for(let i = 0; i<4; i++) buf1[i] = byteArray[i];
+        for(let i = 0; i<4; i++) buf1[i] = byteArray[i+4];
 
         buf1 = Buffer.from(buf1);
         list = [buffer,buf1];
@@ -46,19 +46,22 @@ class Transaction {
 
             byteArray = longToByteArray(inputs[i].index);
             buf1 = new Uint8Array(4)
-            for(let j = 0; j<4; j++) buf1[j] = byteArray[j];
+            for(let j = 0; j<4; j++) buf1[j] = byteArray[j+4];
             buf1 = Buffer.from(buf1);
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
 
             byteArray = longToByteArray(inputs[i].signatureLength);
             buf1 = new Uint8Array(4)
-            for(let j = 0; j<4; j++) buf1[j] = byteArray[j];
+            for(let j = 0; j<4; j++) buf1[j] = byteArray[j+4];
             buf1 = Buffer.from(buf1);
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
 
-            buf1 = Buffer.from(inputs[i].signature);
+            // buf1 = Buffer.from(inputs[i].signature);
+            byteArray = HexToByteArray(inputs[i].signature);
+            buf1 = new Uint8Array(byteArray.length);
+            for(let j=0; j<byteArray.length; j++) buf1[j] = byteArray[j];
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
         }
@@ -66,7 +69,7 @@ class Transaction {
         var outputLength = outputs.length;
         byteArray = longToByteArray(outputLength);
         buf1 = new Uint8Array(4);
-        for(let i = 0; i<4; i++) buf1[i] = byteArray[i];
+        for(let i = 0; i<4; i++) buf1[i] = byteArray[i+4];
         list = [buffer,buf1];
         buffer = Buffer.concat(list);
 
@@ -81,7 +84,7 @@ class Transaction {
 
             byteArray = longToByteArray(outputs[i].publicKeyLength);
             buf1 = new Uint8Array(4);
-            for(let j = 0; j< 4 ; j++) buf1[j] = byteArray[j];
+            for(let j = 0; j< 4 ; j++) buf1[j] = byteArray[j+4];
             buf1 = Buffer.from(buf1);
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
@@ -107,24 +110,20 @@ class Transaction {
             buf = buffer.slice(i, i+32);
             i = i+32;
             var id = ByteArrayToHex(buf);
-            //console.log(id);
 
             buf = buffer.slice(i, i+4);
             i = i+4;
             buf = Uint8Array.from(buf);
             var index = byteArrayToLong(buf);
-            //console.log(index);
 
             buf = buffer.slice(i, i+4);
             i = i+4;
             buf = Uint8Array.from(buf);
             var signatureLength = byteArrayToLong(buf);
-            //console.log(signatureLength);
 
             buf = buffer.slice(i, i + signatureLength);
             i = i + signatureLength;
-            var signature = buf.toString();
-            //console.log(signature);
+            var signature = ByteArrayToHex(buf);
 
             var input = new Input({ id, index, signatureLength, signature });
             inputs.push(input);
@@ -134,7 +133,6 @@ class Transaction {
         i = i+4;
         buf = Uint8Array.from(buf);
         var numOuput = byteArrayToLong(buf);
-        console.log(numOuput);
         var outputs = [];
 
         for(let j=0; j< numOuput; j++) {

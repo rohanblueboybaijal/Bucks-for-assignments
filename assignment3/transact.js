@@ -2,7 +2,7 @@ const Transaction = require('./transaction');
 const Output = require('./output');
 const Input = require('./input');
 const fs = require('fs');
-const { toUTF8Array, longToByteArray, byteArrayToLong, cryptoHash } = require('./utils');
+const { longToByteArray, byteArrayToLong, cryptoHash } = require('./utils');
 const readlineSync = require('readline-sync');
 
 var inputs = [];
@@ -19,7 +19,7 @@ for(let i=0; i < numInput; i++) {
         id: id,
         index: index,
         signature: signature,
-        signatureLength: signature.length
+        signatureLength: Math.floor(signature.length/2)
     });
     inputs.push(input);
 }
@@ -31,6 +31,7 @@ for(let i=0; i< numOutput; i++) {
     coins = readlineSync.question('Enter the number of coins ') - 0;
     publicKeyPath = readlineSync.question('Enter publicKeyPath ');
     publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+   //publicKey = readlineSync.question('Enter the public Key ');
     output = new Output({
         coins: coins,
         publicKeyLength: publicKey.length,
@@ -40,11 +41,11 @@ for(let i=0; i< numOutput; i++) {
 }
 
 var transaction = new Transaction({inputs, outputs});
-var fileName = transaction.id;
-fs.writeFileSync(fileName, transaction.data);
+console.log(transaction);
+// var fileName = transaction.id;
+// fs.writeFileSync(fileName, transaction.data);
 
 var checkTransaction = transaction.byteArrayToTransaction();
-console.log(transaction);
 console.log(checkTransaction);
 
 const numInputs = checkTransaction.inputs.length;
@@ -115,22 +116,3 @@ console.log(check);
 // var checkid = check.id;
 // var val = (checkid == fileName);
 // console.log(val);
-
-
-
-
-
-
-
-// utf8 = toUTF8Array(str);
-// console.log(utf8);
-
-// utf8 = unescape(encodeURIComponent(str));
-
-// var arr = [];
-// for (let i = 0; i< utf8.length; i++) {
-//     arr.push(utf8.charCodeAt(i));
-// }
-
-//0000cc0c644c4a4de29d0d0a5b4cfaa2186718c99dcf2d63c0f0ad5cc59cc4f5
-//0000825430717fb8b3a5e18b2f04c76054ec8b43b0e8e2aac433d12c401da75a
