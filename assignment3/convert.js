@@ -2,70 +2,150 @@ const Transaction = require('./transaction');
 const Output = require('./output');
 const Input = require('./input');
 const fs = require('fs');
-const { toUTF8Array, longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex , cryptoHash } = require('./utils');
+const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex , cryptoHash} = require('./utils');
 
-var fileName = '93725843e69cbae2fa723432b98a60ffe67513b2ecf6cdd216647eb1a8e02faf';
+var fileName = '010.dat';
 var buffer = fs.readFileSync(fileName);
+console.log(buffer);
 
-var i = 0;
-var buf = buffer.slice(i, i+4);
-i = i+4;
-buf = Uint8Array.from(buf);
-var numInput = byteArrayToLong(buf);
-var inputs = [];
+var transaction = byteArrayToTransaction(buffer);
+console.log(transaction);
 
-for(let j=0; j< numInput; j++) {
-    buf = buffer.slice(i, i+32);
-    i = i+32;
-    var id = ByteArrayToHex(buf);
-    //console.log(id);
+function byteArrayToTransaction(data) {
+    const buffer = Buffer.from(data);
+    var i = 0;
+    var buf = buffer.slice(i, i+4);
+    i = i+4;
+    buf = Uint8Array.from(buf);
+    var numInput = byteArrayToLong(buf);
+    var inputs = [];
+
+    for(let j=0; j< numInput; j++) {
+        buf = buffer.slice(i, i+32);
+        i = i+32;
+        var id = ByteArrayToHex(buf);
+
+        buf = buffer.slice(i, i+4);
+        i = i+4;
+        buf = Uint8Array.from(buf);
+        var index = byteArrayToLong(buf);
+
+        buf = buffer.slice(i, i+4);
+        i = i+4;
+        buf = Uint8Array.from(buf);
+        var signatureLength = byteArrayToLong(buf);
+
+        buf = buffer.slice(i, i + signatureLength);
+        i = i + signatureLength;
+        var signature = ByteArrayToHex(buf);
+
+        var input = new Input({ id, index, signatureLength, signature });
+        inputs.push(input);
+    }
 
     buf = buffer.slice(i, i+4);
     i = i+4;
     buf = Uint8Array.from(buf);
-    var index = byteArrayToLong(buf);
-    //console.log(index);
+    var numOuput = byteArrayToLong(buf);
+    var outputs = [];
 
-    buf = buffer.slice(i, i+4);
-    i = i+4;
-    buf = Uint8Array.from(buf);
-    var signatureLength = byteArrayToLong(buf);
-    //console.log(signatureLength);
+    for(let j=0; j< numOuput; j++) {
 
-    buf = buffer.slice(i, i + signatureLength);
-    i = i + signatureLength;
-    var signature = buf.toString();
-    //console.log(signature);
+        buf = buffer.slice(i, i+8);
+        i = i+8;
+        buf = Uint8Array.from(buf);
+        var coins = byteArrayToLong(buf);
 
-    var input = new Input({ id, index, signatureLength, signature });
-    inputs.push(input);
+        buf = buffer.slice(i, i+4);
+        i = i+4;
+        buf = Uint8Array.from(buf);
+        var publicKeyLength = byteArrayToLong(buf);
+
+        buf = buffer.slice(i, i+publicKeyLength);
+        i = i + publicKeyLength;
+        var publicKey = buf.toString();
+        
+        var output = new Output({ coins, publicKeyLength, publicKey });
+        outputs.push(output);
+    }
+
+    var transaction = new Transaction({ inputs, outputs });
+    return transaction;
 }
 
-buf = buffer.slice(i, i+4);
-i = i+4;
-buf = Uint8Array.from(buf);
-var numOuput = byteArrayToLong(buf);
-console.log(numOuput);
-var outputs = [];
 
-for(let j=0; j< numOuput; j++) {
 
-    buf = buffer.slice(i, i+8);
-    i = i+8;
-    buf = Uint8Array.from(buf);
-    var coins = byteArrayToLong(buf);
 
-    buf = buffer.slice(i, i+4);
-    i = i+4;
-    buf = Uint8Array.from(buf);
-    var publicKeyLength = byteArrayToLong(buf);
+// var i = 0;
+// var buf = buffer.slice(i, i+4);
+// i = i+4;
+// buf = Uint8Array.from(buf);
+// var numInput = byteArrayToLong(buf);
+// var inputs = [];
 
-    buf = buffer.slice(i, i+publicKeyLength);
-    i = i + publicKeyLength;
-    var publicKey = buf.toString();
+// for(let j=0; j< numInput; j++) {
+//     buf = buffer.slice(i, i+32);
+//     i = i+32;
+//     var id = ByteArrayToHex(buf);
+
+//     buf = buffer.slice(i, i+4);
+//     i = i+4;
+//     buf = Uint8Array.from(buf);
+//     var index = byteArrayToLong(buf);
+
+//     buf = buffer.slice(i, i+4);
+//     i = i+4;
+//     buf = Uint8Array.from(buf);
+//     var signatureLength = byteArrayToLong(buf);
+
+//     buf = buffer.slice(i, i + signatureLength);
+//     i = i + signatureLength;
+//     buf = Uint8Array.from(buf);
+//     var signature = ByteArrayToHex(buf);
+
+//     var input = new Input({ id, index, signatureLength, signature });
+//     inputs.push(input);
+// }
+
+// buf = buffer.slice(i, i+4);
+// i = i+4;
+// buf = Uint8Array.from(buf);
+// var numOuput = byteArrayToLong(buf);
+
+// var outputs = [];
+
+// for(let j=0; j< numOuput; j++) {
+
+//     buf = buffer.slice(i, i+8);
+//     i = i+8;
+//     buf = Uint8Array.from(buf);
+//     var coins = byteArrayToLong(buf);
+
+//     buf = buffer.slice(i, i+4);
+//     i = i+4;
+//     buf = Uint8Array.from(buf);
+//     var publicKeyLength = byteArrayToLong(buf);
+
+//     buf = buffer.slice(i, i+publicKeyLength);
+//     i = i + publicKeyLength;
+//     var publicKey = buf.toString();
     
-    var output = new Output({ coins, publicKeyLength, publicKey });
-    outputs.push(output);
-}
+//     var output = new Output({ coins, publicKeyLength, publicKey });
+//     outputs.push(output);
+// }
 
-console.log(outputs);
+
+// var transaction = new Transaction({inputs, outputs });
+// console.log(transaction);
+// var checkBuffer = transaction.byteArrayToTransaction();
+// console.log(checkBuffer);
+
+// checkBuffer = Buffer.from((checkBuffer));
+// console.log(checkBuffer);
+// var check = Buffer.compare(buffer, checkBuffer);
+
+// for(let i=0; i<buffer.length; i++) {
+//     if(checkBuffer[i]!=buffer[i]) {
+//         console.log(i, buffer[i], checkBuffer[i]);
+//     }
+// }
