@@ -2,7 +2,7 @@ const Transaction = require('./transaction');
 const Output = require('./output');
 const Input = require('./input');
 const fs = require('fs');
-const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex , cryptoHash} = require('./utils');
+const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex , cryptoHash} = require('../utils');
 
 var fileName = '010.dat';
 var buffer = fs.readFileSync(fileName);

@@ -2,7 +2,7 @@ const Transaction = require('./transaction');
 const Output = require('./output');
 const Input = require('./input');
 const fs = require('fs');
-const { longToByteArray, byteArrayToLong, cryptoHash } = require('./utils');
+const { longToByteArray, byteArrayToLong, cryptoHash } = require('../utils');
 const readlineSync = require('readline-sync');
 
 var inputs = [];
@@ -42,77 +42,45 @@ for(let i=0; i< numOutput; i++) {
 
 var transaction = new Transaction({inputs, outputs});
 console.log(transaction);
-// var fileName = transaction.id;
-// fs.writeFileSync(fileName, transaction.data);
+var fileName = transaction.id;
+console.log(fileName);
+//fs.writeFileSync(fileName, transaction.data);
+
+var data = fs.readFileSync('4363de44cf11799a8b2ae12074fc8edf82aa0ec698c5591498a5f286f59cf0f4.dat');
+var check = Buffer.compare(data, transaction.data);
+console.log(check);
+
+
+
+
+
 
 var checkTransaction = transaction.byteArrayToTransaction();
 console.log(checkTransaction);
 
-const numInputs = checkTransaction.inputs.length;
-for(let i=0;i<numInputs; i++) {
-    var val;
-    val = transaction.inputs[i].id == checkTransaction.inputs[i].id;
-    console.log('id check ', val);
-    val = transaction.inputs[i].index == checkTransaction.inputs[i].id;
-    console.log('index check ', val);
-    val = transaction.inputs[i].signature == checkTransaction.inputs[i].signature;
-    console.log('check signature ', val);
-    val = transaction.inputs[i].signatureLength == checkTransaction.inputs[i].signatureLength;
-    console.log('check signatureLength ', val)
-}
+// const numInputs = checkTransaction.inputs.length;
+// for(let i=0;i<numInputs; i++) {
+//     var val;
+//     val = transaction.inputs[i].id == checkTransaction.inputs[i].id;
+//     console.log('id check ', val);
+//     val = transaction.inputs[i].index == checkTransaction.inputs[i].id;
+//     console.log('index check ', val);
+//     val = transaction.inputs[i].signature == checkTransaction.inputs[i].signature;
+//     console.log('check signature ', val);
+//     val = transaction.inputs[i].signatureLength == checkTransaction.inputs[i].signatureLength;
+//     console.log('check signatureLength ', val)
+// }
 
-const numOutputs = checkTransaction.outputs.length;
-for(let i=0; i<numOutputs; i++) {
-    var val ;
-    val = transaction.outputs[i].coins == checkTransaction.outputs[i].coins;
-    console.log('coins check ', val);
-    val = transaction.outputs[i].publicKey == checkTransaction.outputs[i].publicKey;
-    console.log('publicKey check ' , val);
-    val = transaction.outputs[i].publicKeyLength == checkTransaction.outputs[i].publicKeyLength;
-    console.log('publicKeyLength check', val);
+// const numOutputs = checkTransaction.outputs.length;
+// for(let i=0; i<numOutputs; i++) {
+//     var val ;
+//     val = transaction.outputs[i].coins == checkTransaction.outputs[i].coins;
+//     console.log('coins check ', val);
+//     val = transaction.outputs[i].publicKey == checkTransaction.outputs[i].publicKey;
+//     console.log('publicKey check ' , val);
+//     val = transaction.outputs[i].publicKeyLength == checkTransaction.outputs[i].publicKeyLength;
+//     console.log('publicKeyLength check', val);
 
-}
-var check = JSON.stringify(transaction) == JSON.stringify(checkTransaction);
+// }
+check = JSON.stringify(transaction) == JSON.stringify(checkTransaction);
 console.log(check);
-
-
-// var inputs = [];
-// var input = new Input({ 
-//     id: '0000cc0c644c4a4de29d0d0a5b4cfaa2186718c99dcf2d63c0f0ad5cc59cc4f5',
-//     index: 1,
-//     signature : '0000825430717fb8b3a5e18b2f04c76054ec8b43b0e8e2aac433d12c401da75a',
-//     signatureLength : 64
-// });
-// inputs.push(input);
-// input = new Input({
-//     id: '0000825430717fb8b3a5e18b2f04c76054ec8b43b0e8e2aac433d12c401da75a',
-//     index: 2,
-//     signature : '0000cc0c644c4a4de29d0d0a5b4cfaa2186718c99dcf2d63c0f0ad5cc59cc4f5',
-//     signatureLength : 64
-// });
-
-// inputs.push(input);
-
-// var outputs = [];
-// var output;
-
-// var publicKey = fs.readFileSync('../assignment2/publicAlice.pem', 'utf8');
-// output = new Output({
-//     coins: 20,
-//     publicKey: publicKey,
-//     publicKeyLength: publicKey.length
-// });
-// outputs.push(output);
-
-// publicKey = fs.readFileSync('../assignment2/publicBob.pem', 'utf8');
-// output = new Output({
-//     coins: 50,
-//     publicKey: publicKey,
-//     publicKeyLength: publicKey.length
-// });
-// outputs.push(output);
-
-// var check = new Transaction({inputs, outputs});
-// var checkid = check.id;
-// var val = (checkid == fileName);
-// console.log(val);

@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bigint-conversion": "^2.1.11",
     "express": "^4.17.1",
+    "nano-time": "^1.0.0",
     "readline-sync": "^1.4.10"
   }
 }

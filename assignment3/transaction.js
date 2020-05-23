@@ -1,6 +1,6 @@
 const Input = require('./input');
 const Output = require('./output');
-const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash } = require('./utils');
+const { longToByteArray, byteArrayToLong, HexToByteArray, ByteArrayToHex, cryptoHash } = require('../utils');
 
 class Transaction {
     constructor({ inputs, outputs }) {
@@ -62,6 +62,7 @@ class Transaction {
             byteArray = HexToByteArray(inputs[i].signature);
             buf1 = new Uint8Array(byteArray.length);
             for(let j=0; j<byteArray.length; j++) buf1[j] = byteArray[j];
+            buf1 = Buffer.from(buf1);
             list = [buffer,buf1];
             buffer = Buffer.concat(list);
         }
@@ -70,6 +71,7 @@ class Transaction {
         byteArray = longToByteArray(outputLength);
         buf1 = new Uint8Array(4);
         for(let i = 0; i<4; i++) buf1[i] = byteArray[i+4];
+        buf1 = Buffer.from(buf1);
         list = [buffer,buf1];
         buffer = Buffer.concat(list);
 
