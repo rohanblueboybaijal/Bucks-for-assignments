@@ -1,11 +1,15 @@
 const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : true}));
+
+//var PEERS = ['http://localhost:3000', 'http://localhost:3500'];
+var PEERS = ['https://bfe1c125.ngrok.io'];
 
 var dataObj;
 var map = new Map();
@@ -19,9 +23,7 @@ try {
             map.set(key, value);
         }
     }
-    else {
-        dataObj = {};
-    }
+    else dataObj = {};
 }
 catch(err) {
     console.log(err);
@@ -39,19 +41,28 @@ app.post('/add', (req, res) => {
         map.set(key, value);
         dataObj[key] = value;
 
+        const data = {
+            "key": key,
+            "value": value
+        }
+
+        for(i=0; i<PEERS.length; i++) {
+            axios.post(PEERS[i] + '/add', data)
+                .then((res) => {
+                    console.log(`Sent ${key}: ${value} to ${PEERS[i]}`);
+                })
+                .catch((err) => {
+                    console.log('Error while performing POST request ', err);
+                });
+        }
+
         var jsonText = JSON.stringify(dataObj);
         fs.writeFile('./data.json', jsonText, err => {
-            if(err) {
-                console.log('Error while writing file ', err);
-            }
-            else {
-                console.log('File successfully written!');
-            }
+            if(err) console.log('Error while writing file ', err);
+            else console.log('File successfully written!');
         })
     }
-    else {
-        console.log(`Value of ${key} already exists`);
-    }
+    else console.log(`Value of ${key} already exists`);
 
     res.send('Pair received');
 });
